@@ -1,31 +1,40 @@
-from flask import Flask, request
+from flask import Flask, request , render_template
+from flask_debugtoolbar import DebugToolbarExtension
+from random import choice, randint, sample
 app = Flask(__name__)
 
+app.config['SECRET_KEY'] = 'chickensarecool'
+debug = DebugToolbarExtension(app)
+
+COMPLIMENTS=['cool','clever', 'tenacious', 'awesome', 'Pythonic']
+
+@app.route('/form')
+def show_form():
+    return render_template('form.html')
+
+@app.route('/greet')
+def get_greeting():
+    username=request.args['username']
+    wants=request.args.get('wants_compliments')
+    nice_things = sample(COMPLIMENTS, 3)
+    return render_template('greet.html', username=username, compliments=nice_things, wants_compliments=wants)
+
+@app.route('/spell/<word>')
+def spell_word(word):
+    return render_template('spell_word.html', word=word)
+
+@app.route('/lucky')
+def lucky_numbner():
+    num = randint(1,10)
+    return render_template('lucky.html', lucky_num=num)
 
 @app.route('/')
 def home_page():
-    html = '''
-    <html>
-        <body>
-            <h1>Home Page</h1>
-            <p>Welcome to my simple app!</p>
-            <a href='/hello'>Go to hello page</a>
-        </body>
-    </html>
-    '''
-    return html
+    return render_template('home.html')
 
 @app.route('/hello')
 def say_hello():
-    html = '''
-    <html>
-        <body>
-            <h1>Hello!</h1>
-            <a href='/'>Go to main page</a>
-        </body>
-    </html>
-    '''
-    return html
+    return render_template('hello.html')
 
 @app.route('/search')
 def search():
