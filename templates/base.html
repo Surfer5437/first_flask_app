@@ -14,7 +14,13 @@
         <a href="/hello">Hello</a>
         <a href="/lucky">Lucky</a>
 </nav>
+
 <main id="content">
+    <section class="messages">
+    {% for category, message in get_flashed_messages(with_categories=true) %}
+    <p class="{{category}}">{{message}}</p>
+    {% endfor %}
+</section>
 {% block content %} {% endblock %}
 </main>
     <script src="/static/app.js"></script>

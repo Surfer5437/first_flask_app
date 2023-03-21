@@ -1,8 +1,9 @@
-from flask import Flask, request , render_template
+from flask import Flask, request , render_template, redirect, flash
 from flask_debugtoolbar import DebugToolbarExtension
 from random import choice, randint, sample
 app = Flask(__name__)
 
+app.config['DEBUG_TB_INTERCEPT_REDIRECTS']=False
 app.config['SECRET_KEY'] = 'chickensarecool'
 debug = DebugToolbarExtension(app)
 
@@ -11,6 +12,41 @@ COMPLIMENTS=['cool','clever', 'tenacious', 'awesome', 'Pythonic']
 @app.route('/form')
 def show_form():
     return render_template('form.html')
+
+@app.route('/old-home-page')
+def redirect_to_home():
+    '''Redirects to new home page'''
+    return redirect('/')
+
+
+
+
+# Movies database example with post requests
+
+MOVIES= {'Amadeus', 'Chicken Run', 'Dances With Wolves'}
+
+@app.route('/movies')
+def show_all_movies():
+    '''Show list of all movies in fake DB'''
+    return render_template('movies.html', movies=MOVIES)
+
+@app.route('/movies/new', methods=['POST'])
+def add_movie():
+    title = request.form['title']
+    #  Add to pretend DB
+    if title in MOVIES:
+        flash('Title already in movies', 'error')
+    else:
+        MOVIES.add(title)
+        flash('created your movie', 'success')
+    return redirect('/movies')
+
+
+
+
+
+
+
 
 @app.route('/greet')
 def get_greeting():
@@ -36,58 +72,58 @@ def home_page():
 def say_hello():
     return render_template('hello.html')
 
-@app.route('/search')
-def search():
-    term = request.args['term']
-    sort = request.args['sort']
-    return f'<h1>Search Results For: {term}</h1><p>Sorted by: {sort}'
+# @app.route('/search')
+# def search():
+#     term = request.args['term']
+#     sort = request.args['sort']
+#     return f'<h1>Search Results For: {term}</h1><p>Sorted by: {sort}'
 
-# @app.route('/post', methods=['POST'])
-# def post_demo():
-#     return 'You made a POST request'
+# # @app.route('/post', methods=['POST'])
+# # def post_demo():
+# #     return 'You made a POST request'
 
 
-@app.route('/add-comment')
-def add_comment_form():
-    return '''
-    <h1>AddComment</h1>
-    <form method='POST'>
-        <input type='text' placeholder='comment'name='comment'/>
-        <input type='text' placeholder='username' name='username'/>
-        <button>Submit</button>
-    </form>
-    '''
+# @app.route('/add-comment')
+# def add_comment_form():
+#     return '''
+#     <h1>AddComment</h1>
+#     <form method='POST'>
+#         <input type='text' placeholder='comment'name='comment'/>
+#         <input type='text' placeholder='username' name='username'/>
+#         <button>Submit</button>
+#     </form>
+#     '''
 
-@app.route('/add-comment',methods=['POST'])
-def save_comment():
-    comment= request.form['comment']
-    username=request.form['username']
-    print(request.form)
-    return f'''
-    <h1>SAVED YOUR COMMENT!</h1>
-    <ul>
-        <li>Username: {username}</li>
-        <li>Comment: {comment}</li>
-    </ul>
-    '''
+# @app.route('/add-comment',methods=['POST'])
+# def save_comment():
+#     comment= request.form['comment']
+#     username=request.form['username']
+#     print(request.form)
+#     return f'''
+#     <h1>SAVED YOUR COMMENT!</h1>
+#     <ul>
+#         <li>Username: {username}</li>
+#         <li>Comment: {comment}</li>
+#     </ul>
+#     '''
 
-@app.route('/r/<subreddit>')
-def show_subreddit(subreddit):
-    return f'THIS IS A SUBREDDIT{subreddit}'
+# @app.route('/r/<subreddit>')
+# def show_subreddit(subreddit):
+#     return f'THIS IS A SUBREDDIT{subreddit}'
 
-POSTS={
-    1:'I like chicken tenders',
-    2:'I hate Mayo',
-    3:'Double rainbow all the way',
-    4:'YOLO OMG(kill me)'
-}
+# POSTS={
+#     1:'I like chicken tenders',
+#     2:'I hate Mayo',
+#     3:'Double rainbow all the way',
+#     4:'YOLO OMG(kill me)'
+# }
 
-@app.route('/posts/<int:id>')
-def find_post(id):
-    post = POSTS[id]
-    return f'<p>{post}</p>'
+# @app.route('/posts/<int:id>')
+# def find_post(id):
+#     post = POSTS[id]
+#     return f'<p>{post}</p>'
 
-@app.route('/r/<subreddit>/comments/<int:post_id>')
-def show_comments(subreddit, post_id):
-    post = POSTS[post_id]
-    return f'<h1>Viewing comments for post with id: {post_id} from {subreddit} Subreddit</h1><br><p>{post}</p>'
+# @app.route('/r/<subreddit>/comments/<int:post_id>')
+# def show_comments(subreddit, post_id):
+#     post = POSTS[post_id]
+#     return f'<h1>Viewing comments for post with id: {post_id} from {subreddit} Subreddit</h1><br><p>{post}</p>'
